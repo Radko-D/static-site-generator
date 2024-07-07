@@ -17,6 +17,11 @@ class TestTextNode(unittest.TestCase):
     def test_url_none(self):
         node = TextNode("This is a text node", "italic")
         self.assertEqual(node.url, None)
+    
+    def test_eq_url(self):
+        node = TextNode("This is a text node", "text", "https://www.google.com")
+        node2 = TextNode("This is a text node", "text", "https://www.google.com")
+        self.assertEqual(node, node2)
 
 
 if __name__ == "__main__":
