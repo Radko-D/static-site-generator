@@ -1,6 +1,5 @@
 from htmlnode import LeafNode
 
-
 class TextNode:
     def __init__(self, text, text_type, url=None):
         self.text = text
@@ -32,3 +31,4 @@ class TextNode:
             case "code":
                 return LeafNode("code", text_node.text)
         raise Exception(f"Unknown text type: {text_node.text_type}")
+    
