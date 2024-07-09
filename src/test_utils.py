@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode
-from utils import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image
+from utils import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_links
 
 
 class TestUtils(unittest.TestCase):
@@ -46,7 +46,6 @@ class TestUtils(unittest.TestCase):
     def test_split_nodes_image(self):
         node = TextNode("This is an image ![image](https://www.google.com) and this is follow-up text", "text")
         new_nodes = split_nodes_image([node])
-        print(new_nodes)
         self.assertEqual(new_nodes, [
         TextNode("This is an image ", "text"),
         TextNode("image", "image", "https://www.google.com"),
@@ -59,14 +58,38 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(new_nodes, [node])
 
     def test_split_nodes_image_many_images(self):
-        node = TextNode("This is an image ![image](https://www.google.com) and this is another image ![image](https://www.google.com)", "text")
+        node = TextNode("This is an image ![image](https://www.google.com) and this is another image ![image](https://www.google1.com)", "text")
         new_nodes = split_nodes_image([node])
         self.assertEqual(new_nodes, [
         TextNode("This is an image ", "text"),
         TextNode("image", "image", "https://www.google.com"),
         TextNode(" and this is another image ", "text"),
         TextNode("image", "image", "https://www.google1.com")
-        ])    
+        ])
+    
+    def test_split_nodes_link(self):
+        node = TextNode("This is a link [Google](https://www.google.com) and this is follow-up text", "text")
+        new_nodes = split_nodes_links([node])
+        self.assertEqual(new_nodes, [
+        TextNode("This is a link ", "text"),
+        TextNode("Google", "link", "https://www.google.com"),
+        TextNode(" and this is follow-up text", "text")
+        ])
+        
+    def test_split_nodes_link_no_links(self):
+        node = TextNode("This is a paragraph of text.", "text")
+        new_nodes = split_nodes_links([node])
+        self.assertEqual(new_nodes, [node])
+    
+    def test_split_nodes_link_many_links(self):
+        node = TextNode("This is a link [Google](https://www.google.com) and this is another link [Google](https://www.google1.com)", "text")
+        new_nodes = split_nodes_links([node])
+        self.assertEqual(new_nodes, [
+        TextNode("This is a link ", "text"),
+        TextNode("Google", "link", "https://www.google.com"),
+        TextNode(" and this is another link ", "text"),
+        TextNode("Google", "link", "https://www.google1.com")
+        ])
     
 if __name__ == "__main__":
     unittest.main()
