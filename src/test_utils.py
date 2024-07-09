@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode
-from utils import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_links
+from utils import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_textnodes
 
 
 class TestUtils(unittest.TestCase):
@@ -69,7 +69,7 @@ class TestUtils(unittest.TestCase):
     
     def test_split_nodes_link(self):
         node = TextNode("This is a link [Google](https://www.google.com) and this is follow-up text", "text")
-        new_nodes = split_nodes_links([node])
+        new_nodes = split_nodes_link([node])
         self.assertEqual(new_nodes, [
         TextNode("This is a link ", "text"),
         TextNode("Google", "link", "https://www.google.com"),
@@ -78,17 +78,33 @@ class TestUtils(unittest.TestCase):
         
     def test_split_nodes_link_no_links(self):
         node = TextNode("This is a paragraph of text.", "text")
-        new_nodes = split_nodes_links([node])
+        new_nodes = split_nodes_link([node])
         self.assertEqual(new_nodes, [node])
     
     def test_split_nodes_link_many_links(self):
         node = TextNode("This is a link [Google](https://www.google.com) and this is another link [Google](https://www.google1.com)", "text")
-        new_nodes = split_nodes_links([node])
+        new_nodes = split_nodes_link([node])
         self.assertEqual(new_nodes, [
         TextNode("This is a link ", "text"),
         TextNode("Google", "link", "https://www.google.com"),
         TextNode(" and this is another link ", "text"),
         TextNode("Google", "link", "https://www.google1.com")
+        ])
+    
+    def test_text_to_textnode(self):
+        text = "This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://google.com)"
+        nodes = text_to_textnodes(text)
+        self.assertEqual(nodes, [
+            TextNode("This is ", 'text'),
+            TextNode("text", 'bold'),
+            TextNode(" with an ", 'text'),
+            TextNode("italic", 'italic'),
+            TextNode(" word and a ", 'text'),
+            TextNode("code block", 'code'),
+            TextNode(" and an ", 'text'),
+            TextNode("image", 'image', "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and a ", 'text'),
+            TextNode("link", 'link', "https://google.com"),
         ])
     
 if __name__ == "__main__":
