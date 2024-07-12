@@ -47,18 +47,13 @@ def block_to_block_type(block: str) -> str:
                     return block_type_paragraph
             return block_type_unordered_list
 
-        if block.count(". ") == len(block.splitlines()):
-            is_valid_ordered_list = True
-            block_lines = block.splitlines()
-            for i in range(0, len(block_lines)):
-                if (
-                    not block_lines[i][0].isdigit()
-                    and not block_lines[i - 1][0] + 1 == block_lines[i][0]
-                ):
-                    is_valid_ordered_list = False
-                    break
-            if is_valid_ordered_list:
-                return block_type_ordered_list
+        if block.startswith("1. "):
+            i = 1
+            for line in lines:
+                if not line.startswith(f"{i}. "):
+                    return block_type_paragraph
+                i += 1
+            return block_type_ordered_list
     return block_type_paragraph
 
 
